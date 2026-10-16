@@ -3,84 +3,188 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>我的链接</title>
+<title>Arkr1a · 无限进步</title>
+<link rel="icon" href="assets/avatar.jpg">
 <style>
   :root{
-    --navy:#0A2B4E;          /* 主色 */
-    --navy-deep:#061B33;
-    --blue:#3B82F6;          /* 点缀色 */
-    --blue-light:#60A5FA;
+    --mint:#dff0e3;          /* 页面底 */
+    --side:#e9f5ec;          /* 侧栏底 */
+    --card:#f7fbf8;          /* 卡片底 */
+    --line:#c3ddca;          /* 分隔线 */
+    --ink:#22694a;           /* 正文/图标 */
+    --ink-soft:#5f8f78;      /* 次要文字 */
+    --active:#bfe0cb;        /* 选中底色 */
+    --active-line:#6ea88a;   /* 选中描边 */
   }
   *{box-sizing:border-box}
   body{
-    margin:0;min-height:100vh;display:grid;place-items:center;
+    margin:0;min-height:100vh;display:flex;
+    background:var(--mint);color:var(--ink);
     font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-    color:#fff;
   }
-  /* 深蓝底 + 三层蓝色光晕（南孚风光晕背景，纯 CSS） */
-  body::before{
-    content:"";position:fixed;inset:0;z-index:-1;
-    background:
-      radial-gradient(58% 42% at 50% 34%,rgba(59,130,246,.30),transparent 70%),
-      radial-gradient(70% 55% at 12% 8%,rgba(96,165,250,.16),transparent 65%),
-      radial-gradient(70% 55% at 90% 92%,rgba(59,130,246,.18),transparent 65%),
-      linear-gradient(160deg,#081f3a,var(--navy-deep) 55%,#04121f);
-  }
-  main{display:grid;justify-items:center;gap:clamp(28px,7vw,46px);padding:24px}
+  a{color:inherit;text-decoration:none}
 
-  /* 头像位：旋转光环 + 纯 CSS 鲸鱼标志 */
-  .avatar{position:relative;width:clamp(132px,30vw,180px);aspect-ratio:1}
-  .avatar::before{
-    content:"";position:absolute;inset:0;border-radius:50%;
-    background:conic-gradient(from 0deg,var(--blue),var(--blue-light),transparent 55%,var(--blue));
-    animation:spin 6s linear infinite;
+  /* ---------------- 侧栏 ---------------- */
+  aside{
+    width:280px;flex:none;min-height:100vh;display:flex;flex-direction:column;
+    padding:38px 26px 26px;background:var(--side);border-right:1px solid var(--line);
   }
-  .avatar::after{
-    content:"";position:absolute;inset:4px;border-radius:50%;
-    background:var(--navy-deep);box-shadow:0 0 30px rgba(59,130,246,.6);
+  .avatar{
+    width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:50% 26%;
+    border:3px solid #fff;box-shadow:0 4px 14px rgba(34,105,74,.22);
   }
-  .avatar svg{
-    position:absolute;inset:9px;width:calc(100% - 18px);height:calc(100% - 18px);
-    padding:22%;z-index:1;
-    filter:drop-shadow(0 4px 14px rgba(59,130,246,.55));
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
+  .name{margin:16px 0 4px;font-size:22px;font-weight:700;letter-spacing:.01em}
+  .tag{margin:0;font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+  .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:#79b894}
 
-  /* 圆形图标按钮 */
-  nav{display:flex;gap:clamp(22px,5vw,30px)}
-  nav a{
-    width:clamp(60px,15vw,72px);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;
-    background:rgba(255,255,255,.96);
-    box-shadow:0 8px 22px rgba(6,27,51,.5);
-    transition:transform .22s,box-shadow .22s;
+  /* 纯 CSS 单选切换 */
+  .tabs input{position:absolute;opacity:0;pointer-events:none}
+  nav{display:grid;gap:10px;margin-top:34px;padding-top:26px;border-top:1px solid var(--line)}
+  nav label{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 16px;border-radius:999px;border:1px solid transparent;
+    font-size:14.5px;font-weight:600;color:var(--ink);cursor:pointer;transition:.18s;
   }
-  nav a:hover,nav a:focus-visible{
-    transform:translateY(-5px) scale(1.04);
-    box-shadow:0 14px 30px rgba(59,130,246,.75);
+  nav label:hover{background:rgba(255,255,255,.7)}
+  nav svg{width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;
+          stroke-linecap:round;stroke-linejoin:round}
+  #tab-web:checked ~ nav label[for="tab-web"],
+  #tab-game:checked ~ nav label[for="tab-game"]{
+    background:var(--active);border-color:var(--active-line);
+    box-shadow:0 2px 10px rgba(34,105,74,.14);
   }
-  nav a:focus-visible{outline:2px solid var(--blue-light);outline-offset:4px}
-  nav svg{width:52%;height:52%}
+  #tab-web:focus-visible ~ nav label[for="tab-web"],
+  #tab-game:focus-visible ~ nav label[for="tab-game"]{outline:2px solid var(--active-line);outline-offset:3px}
 
+  .social{margin-top:auto;padding-top:22px;border-top:1px solid var(--line)}
+  .social a{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;transition:.18s}
+  .social a:hover{background:var(--active)}
+  .social svg{width:22px;height:22px;fill:currentColor}
+  .place{margin:0 0 12px;font-size:12px;color:var(--ink-soft)}
+
+  /* ---------------- 主区 ---------------- */
+  main{flex:1;min-width:0;padding:34px 40px 40px;display:flex}
+  .panel{
+    flex:1;background:var(--card);border:1px solid #e2efe6;border-radius:22px;
+    box-shadow:0 10px 30px rgba(34,105,74,.07);
+    padding:26px 28px;display:none;min-height:460px;
+  }
+  #tab-web:checked  ~ main .panel-web,
+  #tab-game:checked ~ main .panel-game{display:flex;flex-direction:column}
+
+  .head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+        padding-bottom:16px;border-bottom:1px solid #e6f1e9}
+  h2{margin:0;font-size:17px;font-weight:700}
+  .hint{margin:0;font-size:12.5px;color:var(--ink-soft)}
+
+  .grid{
+    display:grid;gap:16px;margin-top:22px;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    max-width:960px;                     /* 超宽屏最多三列，卡片不拉伸 */
+  }
+  .item{
+    display:flex;align-items:center;gap:14px;
+    padding:16px 18px;border:1px solid #e4efe7;border-radius:16px;background:#fff;
+    transition:transform .2s,box-shadow .2s,border-color .2s;
+  }
+  .item:hover{
+    transform:translateY(-3px);border-color:var(--active-line);
+    box-shadow:0 12px 26px rgba(34,105,74,.16);
+  }
+  .ico{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:12px;background:var(--mint)}
+  .ico svg{width:24px;height:24px}
+  .meta{min-width:0}
+  .meta b{display:block;font-size:14.5px;font-weight:600}
+  .meta span{display:block;font-size:12px;color:var(--ink-soft);margin-top:3px;
+             overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .empty{
+    margin-top:22px;padding:44px 20px;text-align:center;border:1px dashed #cfe4d6;
+    border-radius:16px;color:var(--ink-soft);font-size:13.5px;background:#fff;
+  }
+
+  @media (max-width:760px){
+    body{flex-direction:column}
+    aside{width:auto;min-height:0;padding:24px 20px;border-right:0;border-bottom:1px solid var(--line)}
+    nav{grid-template-columns:1fr 1fr;margin-top:22px;padding-top:20px}
+    nav label{justify-content:center;padding:10px 12px}
+    .social{margin-top:20px;padding-top:18px;display:flex;align-items:center;gap:10px}
+    .place{margin:0 10px 0 0}
+    main{padding:20px}
+    .panel{padding:20px;min-height:0}
+  }
   @media (prefers-reduced-motion:reduce){
-    .avatar::before{animation:none}
-    nav a{transition:none}
+    .item,.social a{transition:none}
+    .item:hover{transform:none}
   }
 </style>
 </head>
 <body>
-  <main>
-    <div class="avatar" aria-hidden="true">
-      <svg viewBox="0 0 155 111" fill="#4D6BFE"><path d="M147.002 9.113c-1.563-.765-2.236.694-3.15 1.435c-.312.24-.577.55-.841.837c-2.285 2.44-4.954 4.043-8.44 3.851c-5.098-.287-9.45 1.316-13.298 5.215c-.817-4.808-3.534-7.679-7.67-9.52c-2.164-.957-4.352-1.914-5.867-3.995c-1.058-1.483-1.347-3.133-1.876-4.76c-.336-.98-.673-1.985-1.803-2.153c-1.227-.19-1.707.837-2.188 1.699c-1.924 3.516-2.67 7.391-2.597 11.314c.168 8.827 3.895 15.859 11.3 20.858c.843.574 1.059 1.148.794 1.985c-.505 1.723-1.106 3.397-1.635 5.12c-.336 1.1-.842 1.339-2.02.86c-4.063-1.698-7.574-4.21-10.676-7.247c-5.266-5.095-10.027-10.716-15.966-15.118a70 70 0 0 0-4.232-2.894c-6.06-5.884.793-10.716 2.38-11.29c1.66-.598.577-2.655-4.785-2.631s-10.267 1.818-16.519 4.21c-.914.359-1.876.621-2.862.837C49.377 6.65 43.486 6.41 37.33 7.104c-11.59 1.291-20.847 6.77-27.652 16.122C1.502 34.468-.422 47.24 1.935 60.564C4.412 74.605 11.577 86.23 22.591 95.32c11.421 9.424 24.574 14.04 39.579 13.156c9.113-.527 19.26-1.746 30.706-11.434c2.885 1.435 5.915 2.01 10.94 2.44c3.872.359 7.6-.191 10.484-.79c4.52-.956 4.208-5.142 2.573-5.908c-13.249-6.17-10.34-3.66-12.984-5.693c6.732-7.965 16.88-16.241 20.847-43.055c.313-2.129.048-3.469 0-5.19c-.024-1.053.217-1.46 1.419-1.58c3.318-.382 6.54-1.29 9.498-2.918c8.584-4.688 12.047-12.39 12.864-21.623c.12-1.411-.024-2.87-1.515-3.612M72.196 92.21c-12.84-10.094-19.067-13.419-21.64-13.275c-2.405.143-1.972 2.894-1.443 4.688c.553 1.77 1.274 2.99 2.284 4.545c.697 1.028 1.179 2.559-.697 3.708c-4.136 2.559-11.326-.862-11.663-1.03c-8.367-4.927-15.364-11.433-20.294-20.33c-4.761-8.565-7.526-17.75-7.983-27.557c-.12-2.367.577-3.205 2.934-3.635c3.101-.574 6.3-.694 9.401-.24c13.106 1.914 24.262 7.774 33.616 17.055c5.338 5.286 9.378 11.602 13.538 17.773c4.424 6.553 9.185 12.797 15.245 17.915c2.14 1.794 3.847 3.158 5.482 4.163c-4.93.55-13.153.67-18.78-3.78m25.272-29.78a1.883 1.883 0 0 1 2.55-1.77c.264.096.504.24.697.454c.336.335.529.813.529 1.316c0 1.052-.842 1.89-1.9 1.89a1.863 1.863 0 0 1-1.875-1.89m19.116 9.807c-1.226.503-2.452.933-3.63.98c-1.828.096-3.824-.645-4.906-1.554c-1.683-1.412-2.885-2.2-3.39-4.664c-.216-1.053-.096-2.68.096-3.612c.433-2.01-.048-3.3-1.466-4.473c-1.155-.957-2.621-1.22-4.233-1.22c-.6 0-1.153-.263-1.562-.479c-.674-.334-1.227-1.172-.698-2.2c.169-.335.986-1.148 1.179-1.292c2.188-1.244 4.713-.837 7.045.096c2.164.885 3.8 2.512 6.156 4.808c2.404 2.774 2.837 3.54 4.208 5.62c1.082 1.628 2.068 3.302 2.741 5.216c.409 1.196-.12 2.176-1.539 2.774"/></svg>
-    </div>
+  <aside class="tabs">
+    <input type="radio" name="tab" id="tab-web" checked>
+    <input type="radio" name="tab" id="tab-game">
+
+    <img class="avatar" src="assets/avatar.jpg" alt="Arkr1a" width="382" height="382">
+    <h1 class="name">Arkr1a</h1>
+    <p class="tag">滑动翻页 · 无限进步</p>
 
     <nav>
-      <a href="https://github.com/Arkr1a/myweb/" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
-        <svg viewBox="0 0 16 16" fill="#0A2B4E"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-      </a>
-      <a href="https://www.deepseek.com/" target="_blank" rel="noopener" aria-label="DeepSeek" title="DeepSeek">
-        <svg viewBox="0 0 155 111" fill="#4D6BFE"><path d="M147.002 9.113c-1.563-.765-2.236.694-3.15 1.435c-.312.24-.577.55-.841.837c-2.285 2.44-4.954 4.043-8.44 3.851c-5.098-.287-9.45 1.316-13.298 5.215c-.817-4.808-3.534-7.679-7.67-9.52c-2.164-.957-4.352-1.914-5.867-3.995c-1.058-1.483-1.347-3.133-1.876-4.76c-.336-.98-.673-1.985-1.803-2.153c-1.227-.19-1.707.837-2.188 1.699c-1.924 3.516-2.67 7.391-2.597 11.314c.168 8.827 3.895 15.859 11.3 20.858c.843.574 1.059 1.148.794 1.985c-.505 1.723-1.106 3.397-1.635 5.12c-.336 1.1-.842 1.339-2.02.86c-4.063-1.698-7.574-4.21-10.676-7.247c-5.266-5.095-10.027-10.716-15.966-15.118a70 70 0 0 0-4.232-2.894c-6.06-5.884.793-10.716 2.38-11.29c1.66-.598.577-2.655-4.785-2.631s-10.267 1.818-16.519 4.21c-.914.359-1.876.621-2.862.837C49.377 6.65 43.486 6.41 37.33 7.104c-11.59 1.291-20.847 6.77-27.652 16.122C1.502 34.468-.422 47.24 1.935 60.564C4.412 74.605 11.577 86.23 22.591 95.32c11.421 9.424 24.574 14.04 39.579 13.156c9.113-.527 19.26-1.746 30.706-11.434c2.885 1.435 5.915 2.01 10.94 2.44c3.872.359 7.6-.191 10.484-.79c4.52-.956 4.208-5.142 2.573-5.908c-13.249-6.17-10.34-3.66-12.984-5.693c6.732-7.965 16.88-16.241 20.847-43.055c.313-2.129.048-3.469 0-5.19c-.024-1.053.217-1.46 1.419-1.58c3.318-.382 6.54-1.29 9.498-2.918c8.584-4.688 12.047-12.39 12.864-21.623c.12-1.411-.024-2.87-1.515-3.612M72.196 92.21c-12.84-10.094-19.067-13.419-21.64-13.275c-2.405.143-1.972 2.894-1.443 4.688c.553 1.77 1.274 2.99 2.284 4.545c.697 1.028 1.179 2.559-.697 3.708c-4.136 2.559-11.326-.862-11.663-1.03c-8.367-4.927-15.364-11.433-20.294-20.33c-4.761-8.565-7.526-17.75-7.983-27.557c-.12-2.367.577-3.205 2.934-3.635c3.101-.574 6.3-.694 9.401-.24c13.106 1.914 24.262 7.774 33.616 17.055c5.338 5.286 9.378 11.602 13.538 17.773c4.424 6.553 9.185 12.797 15.245 17.915c2.14 1.794 3.847 3.158 5.482 4.163c-4.93.55-13.153.67-18.78-3.78m25.272-29.78a1.883 1.883 0 0 1 2.55-1.77c.264.096.504.24.697.454c.336.335.529.813.529 1.316c0 1.052-.842 1.89-1.9 1.89a1.863 1.863 0 0 1-1.875-1.89m19.116 9.807c-1.226.503-2.452.933-3.63.98c-1.828.096-3.824-.645-4.906-1.554c-1.683-1.412-2.885-2.2-3.39-4.664c-.216-1.053-.096-2.68.096-3.612c.433-2.01-.048-3.3-1.466-4.473c-1.155-.957-2.621-1.22-4.233-1.22c-.6 0-1.153-.263-1.562-.479c-.674-.334-1.227-1.172-.698-2.2c.169-.335.986-1.148 1.179-1.292c2.188-1.244 4.713-.837 7.045.096c2.164.885 3.8 2.512 6.156 4.808c2.404 2.774 2.837 3.54 4.208 5.62c1.082 1.628 2.068 3.302 2.741 5.216c.409 1.196-.12 2.176-1.539 2.774"/></svg>
-      </a>
+      <label for="tab-web">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+        有趣的网站
+      </label>
+      <label for="tab-game">
+        <svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="10" rx="5"/><path d="M7.5 10v4M5.5 12h4M16 11h.01M18 13h.01"/></svg>
+        我的小游戏
+      </label>
     </nav>
+
+    <div class="social">
+      <p class="place">📍 千里广大</p>
+      <a href="https://github.com/Arkr1a/" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <main>
+    <!-- 有趣的网站 -->
+    <section class="panel panel-web">
+      <div class="head">
+        <h2>有趣的网站</h2>
+        <p class="hint">常逛的几个地方</p>
+      </div>
+      <div class="grid">
+        <a class="item" href="https://github.com/" target="_blank" rel="noopener">
+          <span class="ico"><svg viewBox="0 0 16 16" fill="#22694a"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></span>
+          <span class="meta"><b>GitHub</b><span>github.com</span></span>
+        </a>
+
+        <a class="item" href="https://github.com/Arkr1a/Arkr1a" target="_blank" rel="noopener">
+          <span class="ico"><svg viewBox="0 0 16 16" fill="#22694a"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></span>
+          <span class="meta"><b>GitHub · Arkr1a</b><span>github.com/Arkr1a/Arkr1a</span></span>
+        </a>
+
+        <a class="item" href="https://www.deepseek.com/" target="_blank" rel="noopener">
+          <span class="ico"><svg viewBox="0 0 155 111" fill="#4D6BFE"><path d="M147.002 9.113c-1.563-.765-2.236.694-3.15 1.435c-.312.24-.577.55-.841.837c-2.285 2.44-4.954 4.043-8.44 3.851c-5.098-.287-9.45 1.316-13.298 5.215c-.817-4.808-3.534-7.679-7.67-9.52c-2.164-.957-4.352-1.914-5.867-3.995c-1.058-1.483-1.347-3.133-1.876-4.76c-.336-.98-.673-1.985-1.803-2.153c-1.227-.19-1.707.837-2.188 1.699c-1.924 3.516-2.67 7.391-2.597 11.314c.168 8.827 3.895 15.859 11.3 20.858c.843.574 1.059 1.148.794 1.985c-.505 1.723-1.106 3.397-1.635 5.12c-.336 1.1-.842 1.339-2.02.86c-4.063-1.698-7.574-4.21-10.676-7.247c-5.266-5.095-10.027-10.716-15.966-15.118a70 70 0 0 0-4.232-2.894c-6.06-5.884.793-10.716 2.38-11.29c1.66-.598.577-2.655-4.785-2.631s-10.267 1.818-16.519 4.21c-.914.359-1.876.621-2.862.837C49.377 6.65 43.486 6.41 37.33 7.104c-11.59 1.291-20.847 6.77-27.652 16.122C1.502 34.468-.422 47.24 1.935 60.564C4.412 74.605 11.577 86.23 22.591 95.32c11.421 9.424 24.574 14.04 39.579 13.156c9.113-.527 19.26-1.746 30.706-11.434c2.885 1.435 5.915 2.01 10.94 2.44c3.872.359 7.6-.191 10.484-.79c4.52-.956 4.208-5.142 2.573-5.908c-13.249-6.17-10.34-3.66-12.984-5.693c6.732-7.965 16.88-16.241 20.847-43.055c.313-2.129.048-3.469 0-5.19c-.024-1.053.217-1.46 1.419-1.58c3.318-.382 6.54-1.29 9.498-2.918c8.584-4.688 12.047-12.39 12.864-21.623c.12-1.411-.024-2.87-1.515-3.612M72.196 92.21c-12.84-10.094-19.067-13.419-21.64-13.275c-2.405.143-1.972 2.894-1.443 4.688c.553 1.77 1.274 2.99 2.284 4.545c.697 1.028 1.179 2.559-.697 3.708c-4.136 2.559-11.326-.862-11.663-1.03c-8.367-4.927-15.364-11.433-20.294-20.33c-4.761-8.565-7.526-17.75-7.983-27.557c-.12-2.367.577-3.205 2.934-3.635c3.101-.574 6.3-.694 9.401-.24c13.106 1.914 24.262 7.774 33.616 17.055c5.338 5.286 9.378 11.602 13.538 17.773c4.424 6.553 9.185 12.797 15.245 17.915c2.14 1.794 3.847 3.158 5.482 4.163c-4.93.55-13.153.67-18.78-3.78m25.272-29.78a1.883 1.883 0 0 1 2.55-1.77c.264.096.504.24.697.454c.336.335.529.813.529 1.316c0 1.052-.842 1.89-1.9 1.89a1.863 1.863 0 0 1-1.875-1.89m19.116 9.807c-1.226.503-2.452.933-3.63.98c-1.828.096-3.824-.645-4.906-1.554c-1.683-1.412-2.885-2.2-3.39-4.664c-.216-1.053-.096-2.68.096-3.612c.433-2.01-.048-3.3-1.466-4.473c-1.155-.957-2.621-1.22-4.233-1.22c-.6 0-1.153-.263-1.562-.479c-.674-.334-1.227-1.172-.698-2.2c.169-.335.986-1.148 1.179-1.292c2.188-1.244 4.713-.837 7.045.096c2.164.885 3.8 2.512 6.156 4.808c2.404 2.774 2.837 3.54 4.208 5.62c1.082 1.628 2.068 3.302 2.741 5.216c.409 1.196-.12 2.176-1.539 2.774"/></svg></span>
+          <span class="meta"><b>DeepSeek · 官网</b><span>www.deepseek.com</span></span>
+        </a>
+
+        <a class="item" href="https://www.bilibili.com/c/information/" target="_blank" rel="noopener">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#22694a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="12" rx="4"/><path d="M7 3.5 10 7M17 3.5 14 7M8 12h.01M16 12h.01"/></svg></span>
+          <span class="meta"><b>哔哩哔哩 · 资讯</b><span>bilibili.com/c/information</span></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 我的小游戏 -->
+    <section class="panel panel-game">
+      <div class="head">
+        <h2>我的小游戏</h2>
+        <p class="hint">还没上架，先占个位</p>
+      </div>
+      <p class="empty">🎮 小游戏正在开发中，之后会放到这里</p>
+    </section>
   </main>
 </body>
 </html>
