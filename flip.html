@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>翻瓶子 · 挣钱</title>
+<style>
+  :root{
+    --paper:#f2d6a4;        /* 笔记本纸 */
+    --paper-line:#e6c286;   /* 横线 */
+    --ink:#3b2a17;
+    --wood:#4c3020;         /* 木桌 */
+    --mint:#dff0e3;
+    --side:#e9f5ec;
+    --line:#c3ddca;
+    --dark:#22694a;
+    --soft:#5f8f78;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;display:flex;background:var(--mint);color:var(--ink);
+    font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  }
+  /* ---------------- 侧栏（与网站一致） ---------------- */
+  aside{
+    width:280px;flex:none;min-height:100vh;padding:38px 26px 26px;
+    background:var(--side);border-right:1px solid var(--line);color:var(--dark);
+  }
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);
+        text-decoration:none;font-weight:600}
+  .back:hover{color:var(--dark)}
+  h1{margin:22px 0 4px;font-size:22px}
+  .sub{margin:0;font-size:12px;color:var(--soft)}
+
+  /* ---------------- 主区 ---------------- */
+  main{flex:1;min-width:0;padding:26px 30px;display:flex;gap:18px;align-items:stretch}
+
+  /* 顶部信息条 + 进度条 */
+  .stage{
+    flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;
+  }
+  .hud{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    background:var(--side);border:1px solid var(--line);border-radius:16px;padding:12px 16px;
+    color:var(--dark);
+  }
+  .money{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+  .money small{font-size:12px;font-weight:600;color:var(--soft);margin-left:2px}
+  .bar{flex:1;min-width:160px}
+  .bar .track{height:12px;border-radius:999px;background:#cfe4d6;overflow:hidden}
+  .bar .fill{height:100%;width:0;border-radius:999px;
+             background:linear-gradient(90deg,#4fae7c,#8fd6a9);transition:width .35s}
+  .bar .label{display:flex;justify-content:space-between;font-size:11px;color:var(--soft);margin-top:4px}
+
+  /* 笔记本画布 */
+  .board{
+    position:relative;flex:1;min-height:420px;border-radius:14px;overflow:hidden;
+    border:6px solid #3a2418;
+    box-shadow:0 18px 40px rgba(40,25,12,.35),inset 0 0 60px rgba(120,80,30,.18);
+    background:
+      repeating-linear-gradient(0deg,var(--paper) 0 41px,var(--paper-line) 41px 42px),
+      var(--paper);
+  }
+  canvas{display:block;width:100%;height:100%;cursor:pointer;touch-action:manipulation}
+  .toast{
+    position:absolute;left:50%;top:16%;transform:translate(-50%,-10px);
+    font-size:30px;font-weight:900;color:#fff;opacity:0;pointer-events:none;
+    text-shadow:0 3px 0 rgba(0,0,0,.35);transition:opacity .18s,transform .18s;
+    font-variant-numeric:tabular-nums;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.up{color:#8ef0b4}
+  .toast.down{color:#ffd166}
+
+  /* 商店 */
+  .shop{
+    width:220px;flex:none;display:flex;flex-direction:column;gap:12px;
+    background:#cfc3a0;border:2px solid #3a2418;border-radius:14px;padding:12px;
+    color:#2f2417;box-shadow:0 10px 24px rgba(40,25,12,.3);
+  }
+  .shop h2{margin:0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+  .bottle-row{
+    display:flex;align-items:center;gap:10px;background:#e6dcc0;
+    border:2px solid #3a2418;border-radius:10px;padding:10px;
+  }
+  .bottle-row svg{width:26px;height:44px;flex:none}
+  .bottle-row .t{font-size:13px;font-weight:800;line-height:1.25}
+  .bottle-row .c{font-size:11px;opacity:.7;margin-top:2px}
+  .buy{
+    border:2px solid #3a2418;border-radius:10px;background:#f4e9c8;
+    font:inherit;font-weight:800;font-size:14px;padding:10px;cursor:pointer;
+    transition:.15s;
+  }
+  .buy:hover:not(:disabled){background:#fff5da;transform:translateY(-1px)}
+  .buy:disabled{opacity:.45;cursor:not-allowed}
+  .shop .tip{margin:0;font-size:11px;line-height:1.6;opacity:.7}
+
+  .over{
+    position:absolute;inset:0;display:none;place-items:center;text-align:center;
+    background:rgba(46,28,14,.82);color:#ffe9c2;padding:24px;
+  }
+  .over.on{display:grid}
+  .over h3{margin:0 0 8px;font-size:26px}
+  .over p{margin:0 0 18px;font-size:14px;opacity:.85}
+  .over button{
+    border:2px solid #ffe9c2;background:transparent;color:#ffe9c2;font:inherit;
+    font-weight:800;font-size:15px;padding:10px 22px;border-radius:999px;cursor:pointer;
+  }
+  .over button:hover{background:#ffe9c2;color:#3a2418}
+
+  @media (max-width:900px){
+    body{display:block}
+    aside{width:auto;min-height:0;padding:20px;border-right:0;border-bottom:1px solid var(--line)}
+    h1{margin:14px 0 2px}
+    main{display:block;padding:16px}
+    .board{min-height:380px}
+    .shop{width:auto;margin-top:14px}
+    .bottle-row{display:inline-flex;margin-right:10px}
+  }
+</style>
+</head>
+<body>
+  <aside>
+    <a class="back" href="index-home-stacked.html">← 返回主页</a>
+    <h1>翻瓶子</h1>
+    <p class="sub">抛正 +$100 · 抛倒 +$300</p>
+  </aside>
+
+  <main>
+    <div class="stage">
+      <div class="hud">
+        <span class="money">$<span id="money">0</span><small>/ 5000</small></span>
+        <div class="bar">
+          <div class="track"><div class="fill" id="fill"></div></div>
+          <div class="label"><span>进度</span><span id="pct">0%</span></div>
+        </div>
+        <span style="font-size:12px;color:var(--soft)">已用瓶子 <b id="bottles">0</b>/30</span>
+      </div>
+
+      <div class="board" id="board">
+        <canvas id="cv"></canvas>
+        <div class="toast" id="toast"></div>
+        <div class="over" id="over">
+          <div>
+            <h3 id="ovTitle">瓶子用完了</h3>
+            <p id="ovText">钱不够再买一瓶了，点下面重新开始。</p>
+            <button id="again">重新开始</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="shop">
+      <h2>商店</h2>
+      <div class="bottle-row">
+        <svg viewBox="0 0 26 44"><g fill="#cfe3f2" stroke="#5d7f96" stroke-width="1.4">
+          <rect x="3" y="14" width="20" height="28" rx="5"/>
+          <rect x="9" y="4" width="8" height="11" rx="2"/>
+          <rect x="8" y="0" width="10" height="5" rx="1.5" fill="#8fa9bd"/></g></svg>
+        <div>
+          <div class="t">经典瓶</div>
+          <div class="c"><b id="stock">1</b>/30 · $20</div>
+        </div>
+      </div>
+      <button class="buy" id="buy">买一瓶 $20</button>
+      <p class="tip">点瓶子或按空格抛出。<br>落正 +$100，落倒 +$300。<br>攒到 $5000 通关。</p>
+    </div>
+  </main>
+
+<script>
+(() => {
+  const GOAL = 5000, PRICE = 20, MAX_BOTTLES = 30;
+  const UPRIGHT = 100, INVERTED = 300;      // 比例仍是 1 : 3，只是整体 ×100 好让 30 瓶内能攒到目标
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  const board = document.getElementById('board');
+  const $ = id => document.getElementById(id);
+  const toast = $('toast'), over = $('over');
+
+  const G = {
+    money: 0, used: 0, bottles: 1,          // 初始送一瓶，先能玩
+    x: 0, y: 0, rot: 0, w: 1, spinning: false, ended: false,
+    t: 0, dur: 0, phase: 'idle',            // idle | air | land
+    jumps: 0, from: 0, to: 0, peak: 0, fromX: 0, toX: 0,
+    result: 0
+  };
+
+  let W = 0, H = 0;
+  function resize() {
+    const r = board.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (G.phase === 'idle') { G.x = W * 0.5; G.y = H * 0.78; }
+    draw();
+  }
+
+  /* ---------- 画瓶子：rot 旋转，squeeze 横向缩放（翻转错觉） ---------- */
+  function drawBottle(cx, cy, rot, squeeze) {
+    const S = 1.15, bw = 30 * S, bh = 88 * S;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.scale(squeeze, 1);
+    ctx.translate(0, -bh / 2);
+
+    const bodyW = bw, bodyH = bh * 0.66, neckW = bw * 0.36, neckH = bh * 0.2;
+    const capH = bh * 0.06;
+
+    // 瓶身
+    ctx.beginPath();
+    ctx.roundRect(-bodyW / 2, neckH + capH, bodyW, bodyH, bodyW * 0.28);
+    let g = ctx.createLinearGradient(-bodyW / 2, 0, bodyW / 2, 0);
+    g.addColorStop(0, '#a9c6db'); g.addColorStop(.35, '#e8f5ff');
+    g.addColorStop(.65, '#d5e9f7'); g.addColorStop(1, '#93b3c9');
+    ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = '#5d7f96'; ctx.lineWidth = 1.6; ctx.stroke();
+
+    // 瓶颈
+    ctx.beginPath();
+    ctx.roundRect(-neckW / 2, capH, neckW, neckH + 6, neckW * 0.3);
+    ctx.fillStyle = '#dcf0fc'; ctx.fill(); ctx.stroke();
+
+    // 瓶盖
+    ctx.beginPath();
+    ctx.roundRect(-neckW * 0.62, 0, neckW * 1.24, capH, capH * 0.5);
+    ctx.fillStyle = '#7f9cb0'; ctx.fill();
+    ctx.strokeStyle = '#4d6a7e'; ctx.stroke();
+
+    // 高光
+    ctx.beginPath();
+    ctx.roundRect(-bodyW * 0.30, neckH + capH + bodyH * 0.18, bodyW * 0.16, bodyH * 0.5, bodyW * 0.08);
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
+
+    ctx.restore();
+  }
+
+  /* ---------- 地面阴影 ---------- */
+  function drawShadow(alpha) {
+    const w = 46;
+    ctx.save();
+    ctx.translate(G.x, H * 0.86);
+    ctx.scale(1, 0.42);
+    ctx.beginPath(); ctx.arc(0, 0, w / 2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(90,60,25,${alpha})`; ctx.fill();
+    ctx.restore();
+  }
+
+  /* ---------- 主绘制 ---------- */
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // 纸上的装订阴影
+    const vg = ctx.createLinearGradient(0, 0, 0, H);
+    vg.addColorStop(0, 'rgba(120,80,30,.10)');
+    vg.addColorStop(.45, 'rgba(120,80,30,0)');
+    vg.addColorStop(1, 'rgba(120,80,30,.16)');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+
+    drawShadow(G.spinning ? 0.10 : 0.22);
+
+    // 空中：旋转 = 翻转角，透视缩放由同一角度算出；落地：固定正/倒
+    const rot = G.phase === 'air' ? G.rot : (G.settle || 0);
+    const squeeze = G.phase === 'air'
+      ? Math.max(0.22, Math.abs(Math.cos(G.rot * 2)))   // 每半圈收窄一次 → 转起来的错觉
+      : 1;
+    drawBottle(G.x, G.y, rot, squeeze);
+
+    // 落点提示
+    if (G.phase === 'idle' && !G.ended) {
+      ctx.font = '600 13px system-ui,sans-serif';
+      ctx.fillStyle = 'rgba(80,52,22,.55)';
+      ctx.textAlign = 'center';
+      ctx.fillText('点一下抛出瓶子', G.x, H * 0.93);
+    }
+  }
+
+  /* ---------- 一次抛瓶 ---------- */
+  function flip() {
+    if (G.spinning || G.ended) return;
+    if (G.bottles <= 0) { hint('没瓶子了，去商店买'); return; }
+
+    G.bottles--; G.used++;
+    G.spinning = true;
+    G.phase = 'air';
+    G.t = 0;
+    G.dur = 1.15;
+    G.jumps = 2 + Math.floor(Math.random() * 2);     // 2 或 3 周
+    G.from = 0; G.to = G.jumps * Math.PI * 2;
+    G.fromX = G.x;
+    G.toX = W * 0.5 + (Math.random() * 2 - 1) * Math.min(120, W * 0.18);
+    G.peak = Math.min(230, H * 0.42);
+    G.settle = 0;
+    updateHud();
+  }
+
+  /* ---------- 结算 ---------- */
+  function land() {
+    const upright = G.jumps % 2 === 0;
+    const gain = upright ? UPRIGHT : INVERTED;
+    G.money += gain;
+    G.settle = upright ? 0 : Math.PI;
+    G.phase = 'land';
+    G.spinning = false;
+    G.result = gain;
+
+    showToast(upright ? `+$${gain}` : `+$${gain}`, upright ? 'up' : 'down');
+    if (G.money >= GOAL) finish('🎉 通关了！', `攒到 $${G.money}，任务完成。`);
+    else if (G.bottles <= 0 && G.money < PRICE)
+      finish('瓶子用完了', `钱不够再买一瓶了（还差 $${PRICE - G.money}）。`);
+    updateHud();
+  }
+
+  function finish(title, text) {
+    G.ended = true;
+    $('ovTitle').textContent = title;
+    $('ovText').textContent = text;
+    over.classList.add('on');
+  }
+
+  let toastTimer = 0;
+  function showToast(txt, cls) {
+    toast.textContent = txt;
+    toast.className = 'toast show ' + cls;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.className = 'toast ' + cls, 620);
+  }
+  function hint(txt) { showToast(txt, 'down'); }
+
+  /* ---------- HUD ---------- */
+  function updateHud() {
+    $('money').textContent = G.money;
+    $('bottles').textContent = G.used;
+    $('stock').textContent = G.bottles;
+    const pct = Math.min(100, G.money / GOAL * 100);
+    $('fill').style.width = pct.toFixed(2) + '%';
+    $('pct').textContent = pct.toFixed(1) + '%';
+    const buy = $('buy');
+    buy.disabled = G.bottles >= MAX_BOTTLES || G.money < PRICE;
+    buy.textContent = G.bottles >= MAX_BOTTLES ? '已买满' : `买一瓶 $${PRICE}`;
+  }
+
+  /* ---------- 帧循环 ---------- */
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (G.spinning) {
+      G.t += dt;
+      const p = Math.min(1, G.t / G.dur);
+      // 抛物线：上升快落得慢一点
+      const arc = Math.sin(p * Math.PI);
+      G.x = G.fromX + (G.toX - G.fromX) * p;
+      G.y = H * 0.78 - G.peak * arc;
+      G.rot = G.to * (0.5 - 0.5 * Math.cos(p * Math.PI));   // 缓入缓出
+      if (p >= 1) land();
+    }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 交互 ---------- */
+  board.addEventListener('click', e => { if (!e.target.closest('.over')) flip(); });
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); flip(); }
+  });
+  // 面板从隐藏切到可见时尺寸会变，重算一次画布
+  new ResizeObserver(resize).observe(board);
+  $('buy').onclick = () => {
+    if (G.bottles >= MAX_BOTTLES || G.money < PRICE) return;
+    G.money -= PRICE; G.bottles++;
+    updateHud();
+  };
+  $('again').onclick = () => {
+    G.money = 0; G.used = 0; G.bottles = 1;
+    G.ended = false; G.phase = 'idle'; G.spinning = false;
+    G.x = W * 0.5; G.y = H * 0.78; G.settle = 0;
+    over.classList.remove('on'); updateHud();
+  };
+
+  window.addEventListener('resize', resize);
+  resize(); updateHud(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
